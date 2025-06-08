@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: crypto_backend
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    region: singapore
+    plan: free
+    branch: main
+    autoDeploy: true

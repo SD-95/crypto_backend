@@ -1,0 +1,12 @@
+flask
+gunicorn
+numpy
+pandas
+scikit-learn
+matplotlib
+torch
+statsmodels
+tensorflow
+Seaborn
+CORS
+flask-cors

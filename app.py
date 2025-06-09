@@ -14,7 +14,7 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 app = Flask(__name__)
 
 # Enable CORS for specific origins
-CORS(app, resources={r"/predict": {"origins": ["http://localhost:3000", "https://sd-95.github.io/crypto_frontend/"]}})
+CORS(app, resources={r"/predict": {"origins": "https://sd-95.github.io"}})
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODELS_DIR = os.path.join(BASE_DIR, "models")

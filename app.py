@@ -24,8 +24,8 @@ app = Flask(__name__)
 # Use the exact URL of your GitHub Pages deployment.
 # If you are debugging locally, you might temporarily add "http://localhost:XXXX" here
 # or use CORS(app) for broader access during development (NOT production).
-CORS(app, resources={r"/predict": {"origins": "https://sd-95.github.io/crypto_frontend"}})
-logger.info("CORS configured for origin: https://sd-95.github.io/crypto_frontend for /predict route")
+CORS(app, resources={r"/predict": {"origins": "https://sd-95.github.io"}})
+logger.info("CORS configured for origin: https://sd-95.github.io for /predict route")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODELS_DIR = os.path.join(BASE_DIR, "models")

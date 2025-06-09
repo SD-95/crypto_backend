@@ -10,7 +10,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["https://sd-95.github.io"])
+CORS(app, resources={r"/*": {"origins": "https://sd-95.github.io"}})
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,8 +33,10 @@ except Exception as e:
 def home():
     return "Welcome to the Flask API!"
 
-@app.route("/predict", methods=["POST"])
+@app.route("/predict", methods=["POST", "OPTIONS"])
 def predict():
+    if request.method == "OPTIONS":
+        return '', 204
     try:
         data = request.get_json()
         if not data:

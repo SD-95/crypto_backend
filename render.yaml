@@ -3,7 +3,11 @@ services:
     name: crypto_backend
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    # Increase the timeout to, for example, 60 or 90 seconds.
+    # If using render.yaml:
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 90
+    # If using Procfile:
+    # web: gunicorn app:app --timeout 90
     region: singapore
     plan: free
     branch: main

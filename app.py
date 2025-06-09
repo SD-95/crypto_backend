@@ -10,7 +10,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["https://sd-95.github.io/crypto_frontend/"])
+CORS(app, supports_credentials=True, origins=["https://sd-95.github.io"])
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

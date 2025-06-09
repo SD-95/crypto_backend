@@ -1,37 +1,39 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import joblib, numpy as np, os
+import joblib
+import numpy as np
+import os
 from tensorflow.keras.models import load_model
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
 
+# Set environment variable to disable oneDNN optimizations
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
+# Initialize Flask app
 app = Flask(__name__)
 
-# 🚦 Enable CORS for specific origins: local dev and GitHub Pages
-:contentReference[oaicite:2]{index=2}
-    :contentReference[oaicite:3]{index=3}
-    :contentReference[oaicite:4]{index=4}
-]}})
+# Enable CORS for specific origins
+CORS(app, resources={r"/predict": {"origins": ["http://localhost:3000", "https://sd-95.github.io/crypto_frontend/"]}})
 
 # Load models and scaler
-:contentReference[oaicite:5]{index=5}
-:contentReference[oaicite:6]{index=6}
-:contentReference[oaicite:7]{index=7}
-:contentReference[oaicite:8]{index=8}
-:contentReference[oaicite:9]{index=9}
-:contentReference[oaicite:10]{index=10}
-:contentReference[oaicite:11]{index=11}
+rf_model = joblib.load("path_to_rf_model.pkl")
+lstm_model = load_model("path_to_lstm_model.h5")
+meta_model = joblib.load("path_to_meta_model.pkl")
+scaler = joblib.load("path_to_scaler.pkl")
+le = LabelEncoder()
+le.classes_ = np.load("path_to_label_encoder_classes.npy")
 
-:contentReference[oaicite:12]{index=12}
+@app.route("/")
 def home():
-    :contentReference[oaicite:13]{index=13}
+    return "Welcome to the Flask API!"
 
-:contentReference[oaicite:14]{index=14}
+@app.route("/predict", methods=["POST"])
 def predict():
     try:
-        :contentReference[oaicite:15]{index=15}
-        :contentReference[oaicite:16]{index=16}
+        data = request.get_json()
 
-        # Extract and prepare features as before...
+        # Extract and prepare features
         price = float(data.get("price", 0))
         price_1h = float(data.get("price_1h", 0))
         price_24h = float(data.get("price_24h", 0))
@@ -65,6 +67,7 @@ def predict():
         final_pred_class = meta_model.predict(stacked_input)[0]
         final_pred_proba = meta_model.predict_proba(stacked_input)[0][final_pred_class]
         liquidity_level = le.inverse_transform([final_pred_class])[0]
+
         if liquidity_level.lower() == "high" and final_pred_proba < 0.80:
             liquidity_level = "Medium"
 
@@ -75,10 +78,6 @@ def predict():
         else:
             advice = "Avoid"
 
-        print(f"Liquidity Level: {liquidity_level}")
-        print(f"Confidence Score: {round(final_pred_proba * 100, 2)}%")
-        print(f"Investment Advice: {advice}")
-
         return jsonify({
             "liquidity_level": liquidity_level,
             "confidence_score": round(final_pred_proba * 100, 2),
@@ -86,9 +85,7 @@ def predict():
         })
 
     except Exception as e:
-        print("❌ Error during prediction:", e)
         return jsonify({"error": str(e)}), 400
 
-:contentReference[oaicite:17]{index=17}
-    :contentReference[oaicite:18]{index=18}
-    :contentReference[oaicite:19]{index=19}
+if __name__ == "__main__":
+    app.run(debug=True)

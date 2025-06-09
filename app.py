@@ -1,40 +1,53 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
-import joblib
-import numpy as np
-import os
+import joblib, numpy as np, os
 from tensorflow.keras.models import load_model
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import StandardScaler
 
-# Set environment variable to disable oneDNN optimizations
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+# 🔧 Disable oneDNN optimizations for TensorFlow
+:contentReference[oaicite:1]{index=1}
 
-# Initialize Flask app
-app = Flask(__name__)
+:contentReference[oaicite:2]{index=2}
 
-# Enable CORS for specific origins
-CORS(app, resources={r"/predict": {"origins": "https://sd-95.github.io"}})
+# 🌐 Enable CORS globally for your frontend
+CORS(app,
+     :contentReference[oaicite:3]{index=3}
+     :contentReference[oaicite:4]{index=4}
+     :contentReference[oaicite:5]{index=5}
+     supports_credentials=False)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODELS_DIR = os.path.join(BASE_DIR, "models")
+# ✨ Add CORS headers to every response (including preflight)
+@app.after_request
+:contentReference[oaicite:6]{index=6}
+    :contentReference[oaicite:7]{index=7}
+    :contentReference[oaicite:8]{index=8}
+        :contentReference[oaicite:9]{index=9}
+        :contentReference[oaicite:10]{index=10}
+        :contentReference[oaicite:11]{index=11}
+    return response
 
-rf_model = joblib.load(os.path.join(MODELS_DIR, "random_forest_model.pkl"))
-meta_model = joblib.load(os.path.join(MODELS_DIR, "meta_model.pkl"))
-scaler = joblib.load(os.path.join(MODELS_DIR, "scaler.pkl"))
-le = joblib.load(os.path.join(MODELS_DIR, "label_encoder.pkl"))
-lstm_model = load_model(os.path.join(MODELS_DIR, "lstm_model.h5"))
+# 🗂 Load ML models from your 'models' directory
+:contentReference[oaicite:12]{index=12}
+:contentReference[oaicite:13]{index=13}
 
-@app.route("/")
+:contentReference[oaicite:14]{index=14}
+:contentReference[oaicite:15]{index=15}
+:contentReference[oaicite:16]{index=16}
+:contentReference[oaicite:17]{index=17}
+:contentReference[oaicite:18]{index=18}
+
+:contentReference[oaicite:19]{index=19}
 def home():
-    return "Welcome to the Flask API!"
+    :contentReference[oaicite:20]{index=20}
 
-@app.route("/predict", methods=["POST"])
+:contentReference[oaicite:21]{index=21}
 def predict():
+    # 🛑 Preflight response
+    :contentReference[oaicite:22]{index=22}
+        :contentReference[oaicite:23]{index=23}
+
     try:
         data = request.get_json()
-
-        # Extract and prepare features
+        # --- Feature extraction ---
         price = float(data.get("price", 0))
         price_1h = float(data.get("price_1h", 0))
         price_24h = float(data.get("price_24h", 0))
@@ -57,6 +70,7 @@ def predict():
             vol_to_mcap, vol_price_ratio
         ]
 
+        # --- Scaling and model predictions ---
         input_arr = np.array(final_features).reshape(1, -1)
         input_scaled = scaler.transform(input_arr)
         input_seq = input_scaled.reshape((1, 1, input_scaled.shape[1]))
@@ -72,22 +86,21 @@ def predict():
         if liquidity_level.lower() == "high" and final_pred_proba < 0.80:
             liquidity_level = "Medium"
 
-        if liquidity_level.lower() == "high" and final_pred_proba >= 0.80:
-            advice = "Buy"
-        elif liquidity_level.lower() == "medium" or (liquidity_level.lower() == "high" and final_pred_proba >= 0.60):
-            advice = "Hold"
-        else:
-            advice = "Avoid"
+        advice = (
+            "Buy" if liquidity_level.lower() == "high" and final_pred_proba >= 0.80 else
+            "Hold" if liquidity_level.lower() == "medium" or final_pred_proba >= 0.60 else
+            "Avoid"
+        )
 
         return jsonify({
             "liquidity_level": liquidity_level,
             "confidence_score": round(final_pred_proba * 100, 2),
             "investment_advice": advice
-        })
+        }), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+:contentReference[oaicite:24]{index=24}
+    :contentReference[oaicite:25]{index=25}
+    :contentReference[oaicite:26]{index=26}

@@ -16,13 +16,14 @@ app = Flask(__name__)
 # Enable CORS for specific origins
 CORS(app, resources={r"/predict": {"origins": ["http://localhost:3000", "https://sd-95.github.io/crypto_frontend/"]}})
 
-# Load models and scaler
-rf_model = joblib.load("path_to_rf_model.pkl")
-lstm_model = load_model("path_to_lstm_model.h5")
-meta_model = joblib.load("path_to_meta_model.pkl")
-scaler = joblib.load("path_to_scaler.pkl")
-le = LabelEncoder()
-le.classes_ = np.load("path_to_label_encoder_classes.npy")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODELS_DIR = os.path.join(BASE_DIR, "models")
+
+rf_model = joblib.load(os.path.join(MODELS_DIR, "random_forest_model.pkl"))
+meta_model = joblib.load(os.path.join(MODELS_DIR, "meta_model.pkl"))
+scaler = joblib.load(os.path.join(MODELS_DIR, "scaler.pkl"))
+le = joblib.load(os.path.join(MODELS_DIR, "label_encoder.pkl"))
+lstm_model = load_model(os.path.join(MODELS_DIR, "lstm_model.h5"))
 
 @app.route("/")
 def home():
@@ -88,4 +89,5 @@ def predict():
         return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
